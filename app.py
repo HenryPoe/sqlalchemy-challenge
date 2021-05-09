@@ -100,7 +100,7 @@ def tobs():
     yearAgo_str = dt.datetime.strftime(yearAgo_dt, "%Y-%m-%d")
         
     results = session.query(Measurement.tobs, Measurement.date).\
-        filter(Measurement.station == f"{largestStation}", Measurement.date > f"{yearAgo_str}").all()
+        filter(Measurement.station == f"{largestStation}", Measurement.date >= f"{yearAgo_str}").all()
     session.close()
     
     # Create a dictionary 
@@ -122,7 +122,7 @@ def from_date(start):
     
     results = session.query(func.max(Measurement.tobs), func.min(Measurement.tobs),
                             func.avg(Measurement.tobs)).\
-                            filter(Measurement.date > f"{start}").all()
+                            filter(Measurement.date >= f"{start}").all()
     session.close()
     
     return jsonify(list(np.ravel(results)))
@@ -135,7 +135,7 @@ def range_dates(start, end):
     
     results = session.query(func.max(Measurement.tobs), func.min(Measurement.tobs),
                             func.avg(Measurement.tobs)).\
-                            filter(Measurement.date > f"{start}", Measurement.date < f"{end}").\
+                            filter(Measurement.date >= f"{start}", Measurement.date <= f"{end}").\
                                 all()
     session.close()
     
