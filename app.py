@@ -112,20 +112,34 @@ def tobs():
         tobs_output.append(tobs_dict)
     
     # Return the json of dates and precipitations
-    return jsonify(list(np.ravel(results)))
+    return jsonify(tobs_output)
 
 # Start date temperature info route
 @app.route("/api/v1.0/<start>")
 def from_date(start):
-    print("Server received request for")
-    return "a;lskfj;alskdjf;alsdkjf;aslkdfj;aslkfj"
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+    
+    results = session.query(func.max(Measurement.tobs), func.min(Measurement.tobs),
+                            func.avg(Measurement.tobs)).\
+                            filter(Measurement.date > f"{start}").all()
+    session.close()
+    
+    return jsonify(list(np.ravel(results)))
 
 # Start and End date temperature info route
 @app.route("/api/v1.0/<start>/<end>")
 def range_dates(start, end):
-    print("Server received request for")
-    return
-
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+    
+    results = session.query(func.max(Measurement.tobs), func.min(Measurement.tobs),
+                            func.avg(Measurement.tobs)).\
+                            filter(Measurement.date > f"{start}", Measurement.date < f"{end}").\
+                                all()
+    session.close()
+    
+    return jsonify(list(np.ravel(results)))
 
 if __name__ == "__main__":
     app.run(debug=True)
